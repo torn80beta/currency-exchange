@@ -32,7 +32,7 @@ function App() {
     }
 
     navigator.geolocation.getCurrentPosition(success, error, options);
-  }, []);
+  }, [baseCurrency, dispatch]);
 
   return (
     <Routes>
