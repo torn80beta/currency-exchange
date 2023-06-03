@@ -1,13 +1,21 @@
-import { Routes, Route } from 'react-router-dom';
-import './App.css';
-import { SharedLayout } from './components/SharedLayout/SharedLayout';
-import Home from './pages/Home/Home';
-import Rates from './pages/Rates/Rates';
-import { useEffect } from 'react';
-import { getUserInfo } from './services/api';
+import { Routes, Route } from "react-router-dom";
+import "./App.css";
+import { SharedLayout } from "./components/SharedLayout/SharedLayout";
+import Home from "./pages/Home/Home";
+import Rates from "./pages/Rates/Rates";
+import { useEffect } from "react";
+import { fetchBaseCurrency } from "./redux/operations";
+import { useDispatch, useSelector } from "react-redux";
+import { selectBaseCurrency } from "./redux/selectors";
+import { addBaseCurrency } from "./redux/currencySlice";
 
 function App() {
+  const baseCurrency = useSelector(selectBaseCurrency);
+  const dispatch = useDispatch();
   useEffect(() => {
+    if (baseCurrency) {
+      return;
+    }
     const options = {
       enableHighAccuracy: true,
       timeout: 5000,
@@ -16,15 +24,11 @@ function App() {
 
     function success(pos) {
       const crd = pos.coords;
-      getUserInfo(crd);
-      console.log('Your current position is:');
-      console.log(`Latitude : ${crd.latitude}`);
-      console.log(`Longitude: ${crd.longitude}`);
-      console.log(`More or less ${crd.accuracy} meters.`);
+      dispatch(fetchBaseCurrency(crd));
     }
 
     function error(err) {
-      console.warn(`ERROR(${err.code}): ${err.message}`);
+      dispatch(addBaseCurrency("USD"));
     }
 
     navigator.geolocation.getCurrentPosition(success, error, options);
